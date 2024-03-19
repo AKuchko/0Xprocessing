@@ -69,18 +69,25 @@ class Special {
         this.setSpecialCookie();
         break;
       case "audio":
-        if(specialButton.value == 1) {
-          document.querySelector("i.special-audio").remove();
+        const mouseOver = (event) => {
           if (this.$responsiveVoice.isPlaying()) this.$responsiveVoice.cancel();
-          document.querySelector("p,h1,h2,h3,h4,h5,h6,li,dt,dd,.audiotext").re();
+          this.$responsiveVoice.speak(event.target.innerText.trim(), "Russian Female");
+        }
+        const bindedMouseOver = mouseOver.bind(this);
+        if(specialButton.value == 1) {
+          const special_audio = document.querySelector("i.special-audio");
+          if (special_audio) special_audio.remove();
+          if (this.$responsiveVoice.isPlaying()) this.$responsiveVoice.cancel();
+          document.querySelectorAll("p,h1,h2,h3,h4,h5,h6,li,dt,dd,.audiotext").forEach(el => {
+            el.removeEventListener('mouseove', bindedMouseOver);
+          });
           specialButton.value = 0;
         } else {
           this.$responsiveVoice.speak("Включено озвучивание текста.", "Russian Female");
           specialButton.classList.add("active");
           specialButton.value = 1;
-          document.querySelector("p,h1,h2,h3,h4,h5,h6,li,dt,dd,.audiotext,a,b").addEventListener("mouseover", () => {
-            if (this.$responsiveVoice.isPlaying()) this.$responsiveVoice.cancel();
-            this.$responsiveVoice.speak(specialButton.innerText.trim(), "Russian Female");
+          document.querySelectorAll("p,h1,h2,h3,h4,h5,h6,li,dt,dd,.audiotext,a,b").forEach(el => {
+            el.addEventListener("mouseover", bindedMouseOver);
           });
         }
         break;
@@ -155,7 +162,7 @@ class Special {
       const special_audio = document.querySelector('i.special-audio');
       const special = document.querySelector('#special');
 
-      if (this.$responsiveVoice.isPlaying()) this.$responsiveVoice.cancel(); // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      if (this.$responsiveVoice.isPlaying()) this.$responsiveVoice.cancel();
       if (audio) audio.remove();
       if (special_audio) special_audio.remove();
       special.remove();
@@ -770,15 +777,14 @@ class ResponsiveVoice {
           (extraParams = params.extraParams || null)
         );
 
-        bestPitch /= 2; // d
-        besstRate /= 2; // k
-        bestVolume *= 2; // l
+        bestPitch /= 2;
+        besstRate /= 2;
+        bestVolume *= 2;
 
         bestPitch = Math.min(Math.max(bestPitch, 0), 1);
         besstRate = Math.min(Math.max(besstRate, 0), 1);
         bestVolume = Math.min(Math.max(bestVolume, 0), 1);
-
-        bestPitch = this.fallbackServicePath + "?format=mp3&quality=hi&text=" + encodeURIComponent(sentences[g]) + "&lang=" + (msgProfile.collectionvoice.lang || msgProfile.systemvoice.lang || "en-US");
+        bestPitch = this.fallbackServicePath + "?format=mp3&quality=hi&text=" + sentences[g] + "&lang=" + (msgProfile.collectionvoice.lang || msgProfile.systemvoice.lang || "en-US");
         extraParams && (bestPitch += "&extraParams=" + JSON.stringify(m));
         besstRate = document.createElement("AUDIO");
         besstRate.src = bestPitch;
@@ -850,9 +856,9 @@ class ResponsiveVoice {
       fallbackAudio.play();
       fallbackAudio.playbackRate = this.fallback_playbackrate;
     };
-    this.fallback_errors && a.speech_onend();
+    this.fallback_errors && this.speech_onend();
     this.fallback_audio.play();
-    this.fallback_audio.addEventListener("ended", this.finishFallbackPart);
+    this.fallback_audio.addEventListener("ended", () => this.finishFallbackPart());
     this.useTimer && this.startTimeout(this.multipartText[this.fallback_part_index], this.finishFallbackPart);
   }
 
@@ -865,7 +871,7 @@ class ResponsiveVoice {
   clearFallbackPool () {
     if (!this.fallback_audiopool) return;
     this.fallback_audiopool.forEach(fallback => {
-      fallback.psuse();
+      fallback.pause();
       fallback.src = '';
     });
     this.fallback_audiopool = [];
@@ -981,7 +987,6 @@ class ResponsiveVoice {
     this.cancelled
       ? (this.cancelled = !1)
       : (
-        this.log("on end fired"),
         this.msgparameters != null &&
         this.msgparameters.onend != null &&
         this.msgparameters.onendcalled != 1 &&
@@ -1027,7 +1032,7 @@ class ResponsiveVoice {
 
   getEstimatedTimeLength (b, timerSpeed) {
     const words = this.getWords(b);
-    const h = 0;
+    let h = 0;
     const f = this.fallbackMode ? 1300 : 700;
     const _timerSpeed = timerSpeed || 1;
     words.map(() => {
@@ -1050,7 +1055,7 @@ class ResponsiveVoice {
   /* Event */
   Dispatch (event) {
     if (this.hasOwnProperty(event + "_callbacks") && null != this[event + "_callbacks"] && 0 < this[event + "_callbacks"].length) {
-      for (const c = a[event + "_callbacks"], e = 0; e < c.length; e++) c[e]();
+      for (let c = a[event + "_callbacks"], e = 0; e < c.length; e++) c[e]();
       return !0;
     }
     const h = event + "_callbacks_timeout";
@@ -1170,55 +1175,30 @@ HTMLElement.prototype.removeClassWild = function (mask) {
   return this;
 };
 HTMLElement.prototype.slideUp = function (duration=500) {
-  this.style.transitionProperty = 'height, margin, padding'; /* [1.1] */
-  this.style.transitionDuration = duration + 'ms'; /* [1.2] */
+  this.style.transition = `height ${duration}ms`;
   this.style.boxSizing = 'border-box'; /* [2] */
   this.style.height = this.offsetHeight + 'px'; /* [3] */
-  this.style.height = 0; /* [4] */
-  this.style.paddingTop = 0; /* [5.1] */
-  this.style.paddingBottom = 0; /* [5.2] */
-  this.style.marginTop = 0; /* [6.1] */
-  this.style.marginBottom = 0; /* [7.2] */
   this.style.overflow = 'hidden'; /* [7] */
-  window.setTimeout(() => {
+  setTimeout(() => this.style.height = '0px', 0);
+  setTimeout(() => {
     this.style.display = 'none'; /* [8] */
     this.style.removeProperty('height'); /* [9] */
-    this.style.removeProperty('padding-top');  /* [10.1] */ 
-    this.style.removeProperty('padding-bottom');  /* [10.2] */ 
-    this.style.removeProperty('margin-top');  /* [11.1] */ 
-    this.style.removeProperty('margin-bottom');  /* [11.2] */ 
     this.style.removeProperty('overflow');  /* [12] */ 
-    this.style.removeProperty('transition-duration');  /* [13.1] */ 
-    this.style.removeProperty('transition-property');  /* [13.2] */ 
+    this.style.removeProperty('transition'); /* [14] */
   }, duration);
 };
 HTMLElement.prototype.slideDown = function (duration=500) {
-  this.style.removeProperty('display'); /* [1] */
-  let display = window.getComputedStyle(this).display;
-  if (display === 'none') { /* [2] */
-    display = 'block';
-  }
-  this.style.display = display;
+  this.style.display = 'block';
   let height = this.offsetHeight; /* [3] */
   this.style.height = 0; /* [4] */
-  this.style.paddingTop = 0; /* [5.1] */
-  this.style.paddingBottom = 0; /* [5.2] */ 
-  this.style.marginTop = 0; /* [6.1] */ 
-  this.style.marginBottom = 0; /* [6.2] */ 
   this.style.overflow = 'hidden'; /* [7] */ 
   this.style.boxSizing = 'border-box'; /* [8] */
-  this.style.transitionProperty = "height, margin, padding";  /* [9.1] */ 
-  this.style.transitionDuration = duration + 'ms'; /* [9.2] */
-  this.style.height = height + 'px'; /* [10] */
-  this.style.removeProperty('padding-top'); /* [11.1] */ 
-  this.style.removeProperty('padding-bottom'); /* [11.2] */ 
-  this.style.removeProperty('margin-top'); /* [12.1] */ 
-  this.style.removeProperty('margin-bottom'); /* [12.2] */
-  window.setTimeout(() => {
+  this.style.transition = `height ${duration}ms`;
+  setTimeout(() => this.style.height = height + 'px', 0);
+  setTimeout(() => {
     this.style.removeProperty('height'); /* [13] */
     this.style.removeProperty('overflow'); /* [14] */
-    this.style.removeProperty('transition-duration'); /* [15.1] */
-    this.style.removeProperty('transition-property'); /* [15.2] */
+    this.style.removeProperty('transition'); /* [14] */
   }, duration);
 };
 HTMLElement.prototype.slideToggle = function (duration=500) {
