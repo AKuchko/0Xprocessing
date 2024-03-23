@@ -10,8 +10,11 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@vuelidate/core": "^2.0.3",
+    "@vuelidate/validators": "^2.0.4",
     "nuxt": "^3.10.3",
     "pinia": "^2.1.7",
+    "sass": "^1.71.1",
     "vue": "^3.4.19",
     "vue-router": "^4.3.0"
   },
