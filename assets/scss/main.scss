@@ -1,0 +1,69 @@
+*, 
+*::before,
+*::after {
+	padding: 0;
+	margin: 0;
+	border: 0;
+	box-sizing: border-box;
+	user-select: none;
+	transition: color 0.2s ease-in-out;
+}
+a {
+	text-decoration: none;
+	color: inherit;
+}
+ul, 
+ol, 
+li {
+	list-style: none;
+}
+img {
+	vertical-align: top;
+}
+h1,
+h2, 
+h3,
+h4,
+h5,
+h6{
+	font-weight: inherit;
+	font-size: inherit;
+}
+html,
+body{
+	color: #111;
+	height: 100%;
+	line-height: 1;
+	font-family: 'Ubuntu';
+	font-size: 16px;
+	font-weight: normal;
+	font-style: normal;
+	color-scheme: light dark;
+	scroll-behavior: smooth;
+}
+	
+html[data-theme=light] { color-scheme: light; }
+html[data-theme=dark] { color-scheme: dark; }
+
+button {
+	color: inherit;
+	font-size: inherit;
+	font-weight: inherit;
+	font-style: inherit;
+	text-transform: inherit;
+	background: transparent;
+}
+input {
+  outline: none;
+	color: inherit;
+	font-size: inherit;
+	background: inherit;
+}
+[contenteditable] {
+    -webkit-user-select: text;
+    user-select: text;
+}
+
+.lock {
+  overflow: hidden;
+}
