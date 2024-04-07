@@ -20,17 +20,23 @@ export default defineI18nConfig(() => ({
 
       /* HEADER */
       header: {
-        list: [
-          'Features',
-          'Advantages',
-          'Technical support',
-          'Integration',
-          'Fees',
-          'Business',
-          'Gambling',
-          'Contact us',
-        ],
+        feature: 'Features',
+        advantages: 'Advantages',
+        support: 'Technical support',
+        integration: 'Integration',
+        fees: 'Fees',
+        business: 'Business',
+        gambling: 'Gambling',
+        contacts: 'Contact us',
       },
+
+      index: {
+        table: {
+          '0xProcessing': '0XProcessing',
+          'fiatProcessing': 'FiatProcessing',
+          'cryptoProcessing': 'CryptoProcessing',
+        }
+      }
     },
 
     ru: {
@@ -50,17 +56,23 @@ export default defineI18nConfig(() => ({
 
       /* HEADER */
       header: {
-        list: [
-          'Функционал',
-          'Преимущесва',
-          'Тех. поддержка',
-          'Интеграция',
-          'Fees',
-          'Business',
-          'Gambling',
-          'Связаться с нами',
-        ],
+        feature: 'Функционал',
+        advantages: 'Преимущесва',
+        support: 'Тех. поддержка',
+        integration: 'Интеграция',
+        fees: 'Fees',
+        business: 'Business',
+        gambling: 'Gambling',
+        contacts: 'Связаться с нами',
       },
+
+      index: {
+        table: {
+          '0xProcessing': '0XProcessing',
+          'fiatProcessing': 'FiatProcessing',
+          'cryptoProcessing': 'CryptoProcessing',
+        }
+      }
     },
 
   }
